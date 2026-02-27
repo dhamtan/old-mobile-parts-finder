@@ -30,7 +30,7 @@
         .facebook{background:linear-gradient(135deg,#1877f2,#1d4ed8);}
         .indiamart{background:linear-gradient(135deg,#14b8a6,#0d9488);}
         .location-badge{background:#f3f4f6;color:#64748b;padding:8px 16px;border-radius:20px;font-weight:600;}
-        .buy-redirect{width:100%;padding:25px 20px;background:linear-gradient(135deg,#ef4444,#dc2626);color:white;border:none;border-radius:20px;font-size:1.6em;font-weight:800;cursor:pointer;margin-top:25px;box-shadow:0 10px 30px rgba(239,68,68,0.4);}
+        .buy-redirect{width:100%;padding:25px 20px;background:linear-gradient(135deg,#ef4444,#dc2626);color:white;border:none;border-radius:20px;font-size:1.6em;font-weight:800;cursor:pointer;margin-top:25px;box-shadow:0 10px 30px rgba(239,68,68,0.4);transition:all 0.3s;}
         .buy-redirect:hover{transform:scale(1.03);}
         .no-results{text-align:center;padding:80px 40px;color:#64748b;}
         .loading{text-align:center;padding:60px;color:#3b82f6;}
@@ -185,7 +185,7 @@
                     <h2 style="color:#1e293b;font-size:2.2em;">${data.length} deals found for "${query}"</h2>
                     <p style="color:#64748b;font-size:18px;">Maxbhi, OLX, IndiaMart से live prices</p>
                 </div>
-                ${data.map((listing) => `
+                ${data.map((listing, index) => `
                     <div class="listing-card">
                         <div class="part-title">${listing.name}</div>
                         <div class="price-big">₹${listing.price.toLocaleString()}</div>
@@ -198,12 +198,15 @@
                             </div>
                             <div style="color:#64748b;font-size:18px;">${listing.condition}</div>
                         </div>
-                        <button class="buy-redirect" onclick="buyNow('${listing.url}', '${listing.name}')">
+                        <button class="buy-redirect" onclick="buyNow(${index})">
                             🚀 BUY NOW - Direct ${listing.source}
                         </button>
                     </div>
                 `).join('')}
             `;
+            
+            // Store URLs globally for buyNow function
+            window.searchResults = data;
         }
 
         function getSourceIcon(source) {
@@ -214,9 +217,12 @@
             return icons[source] || '🔍';
         }
 
-        function buyNow(url, name) {
-            gtag_report_conversion(url); // Google Analytics (optional)
-            window.open(url, '_blank');
+        function buyNow(index) {
+            const results = window.searchResults;
+            if(results && results[index]) {
+                const url = results[index].url;
+                window.open(url, '_blank');
+            }
         }
 
         // ENTER KEY + REAL-TIME
